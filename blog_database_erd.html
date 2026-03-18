@@ -1,0 +1,132 @@
+<style>
+#erd { padding: 0; }
+#erd svg { width: 100%; height: auto; }
+</style>
+<div id="erd"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#1d2b35' : '#e6f1fb',
+    primaryBorderColor: dark ? '#185fa5' : '#378add',
+    primaryTextColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const diagram = `erDiagram
+    T_USER {
+        bigint id PK
+        varchar username
+        varchar password
+        varchar email
+        varchar avatar
+        varchar nickname
+        varchar role
+        tinyint status
+        datetime last_login_time
+        datetime created_at
+    }
+    T_BLOG {
+        bigint id PK
+        bigint user_id FK
+        bigint category_id FK
+        varchar title
+        longtext content
+        varchar cover_img
+        varchar summary
+        int views
+        int likes
+        tinyint status
+        tinyint is_top
+        tinyint is_featured
+        datetime created_at
+        datetime updated_at
+    }
+    T_CATEGORY {
+        bigint id PK
+        varchar name
+        varchar description
+        int sort_order
+        tinyint status
+        datetime created_at
+    }
+    T_TAG {
+        bigint id PK
+        varchar name
+        varchar color
+        datetime created_at
+    }
+    T_BLOG_TAG {
+        bigint blog_id FK
+        bigint tag_id FK
+    }
+    T_COMMENT {
+        bigint id PK
+        bigint blog_id FK
+        bigint user_id FK
+        bigint parent_id FK
+        text content
+        tinyint status
+        datetime created_at
+    }
+    T_BANNER {
+        bigint id PK
+        varchar title
+        varchar image_url
+        varchar link_url
+        int sort_order
+        tinyint status
+        datetime created_at
+    }
+    T_ADVERTISEMENT {
+        bigint id PK
+        varchar title
+        varchar image_url
+        varchar link_url
+        varchar position
+        tinyint status
+        datetime expired_at
+        datetime created_at
+    }
+    T_USER ||--o{ T_BLOG : "撰写"
+    T_CATEGORY ||--o{ T_BLOG : "分类"
+    T_BLOG ||--o{ T_BLOG_TAG : "标记"
+    T_TAG ||--o{ T_BLOG_TAG : "属于"
+    T_BLOG ||--o{ T_COMMENT : "包含"
+    T_USER ||--o{ T_COMMENT : "评论"
+    T_COMMENT }o--o| T_COMMENT : "回复"
+`;
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd').innerHTML = svg;
+document.querySelectorAll('#erd svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+document.querySelectorAll('#erd svg .row-rect-odd path, #erd svg .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>

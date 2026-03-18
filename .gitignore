@@ -1,0 +1,39 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Java / Maven / Gradle
+webssh-backend/target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# OS / tooling
+.nyc_output/
+coverage/
+
+# Local archives
+*.zip
