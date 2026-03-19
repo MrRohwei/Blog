@@ -19,6 +19,7 @@ public enum ErrorCode {
     USERNAME_DUPLICATE(1004, "用户名已存在"),
 
     BLOG_NOT_FOUND(2001, "博客不存在"),
+    BLOG_ALREADY_LIKED(2002, "今天已经点过赞了"),
     CATEGORY_NOT_FOUND(3001, "分类不存在"),
     CATEGORY_DUPLICATE(3002, "分类名称已存在"),
     CATEGORY_HAS_BLOGS(3003, "该分类下存在博客，无法删除"),

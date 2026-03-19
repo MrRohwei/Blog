@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voidpen.server.module.blog.mapper.BlogTagMapper">
+
+    <delete id="deleteByBlogId">
+        DELETE FROM t_blog_tag
+        WHERE blog_id = #{blogId}
+    </delete>
+
+    <insert id="batchInsert">
+        INSERT INTO t_blog_tag (blog_id, tag_id)
+        VALUES
+        <foreach collection="relations" item="relation" separator=",">
+            (#{relation.blogId}, #{relation.tagId})
+        </foreach>
+    </insert>
+
+    <select id="selectTagRelationsByBlogIds" resultType="com.voidpen.server.module.blog.model.response.BlogTagRelationVO">
+        SELECT
+            bt.blog_id AS blogId,
+            t.id AS tagId,
+            t.name AS tagName,
+            t.color AS tagColor
+        FROM t_blog_tag bt
+        LEFT JOIN t_tag t ON bt.tag_id = t.id
+        WHERE bt.blog_id IN
+        <foreach collection="blogIds" item="blogId" open="(" separator="," close=")">
+            #{blogId}
+        </foreach>
+        ORDER BY t.id ASC
+    </select>
+
+    <select id="selectTagRelationsByBlogId" resultType="com.voidpen.server.module.blog.model.response.BlogTagRelationVO">
+        SELECT
+            bt.blog_id AS blogId,
+            t.id AS tagId,
+            t.name AS tagName,
+            t.color AS tagColor
+        FROM t_blog_tag bt
+        LEFT JOIN t_tag t ON bt.tag_id = t.id
+        WHERE bt.blog_id = #{blogId}
+        ORDER BY t.id ASC
+    </select>
+</mapper>

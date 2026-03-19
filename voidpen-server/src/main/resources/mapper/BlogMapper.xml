@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voidpen.server.module.blog.mapper.BlogMapper">
+
+    <select id="selectBlogPage" resultType="com.voidpen.server.module.blog.model.response.BlogListVO">
+        SELECT
+            b.id,
+            b.user_id AS userId,
+            b.category_id AS categoryId,
+            b.title,
+            b.cover_img AS coverImg,
+            b.summary,
+            b.views,
+            b.likes,
+            b.status,
+            b.is_top AS isTop,
+            b.is_featured AS isFeatured,
+            b.created_at AS createdAt,
+            b.updated_at AS updatedAt,
+            c.name AS categoryName,
+            COALESCE(u.nickname, u.username) AS authorName
+        FROM t_blog b
+        LEFT JOIN t_category c ON b.category_id = c.id
+        LEFT JOIN t_user u ON b.user_id = u.id
+        <where>
+            <if test="status != null">
+                b.status = #{status}
+            </if>
+            <if test="categoryId != null">
+                AND b.category_id = #{categoryId}
+            </if>
+            <if test="tagId != null">
+                AND EXISTS (
+                    SELECT 1
+                    FROM t_blog_tag bt
+                    WHERE bt.blog_id = b.id AND bt.tag_id = #{tagId}
+                )
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    b.title LIKE CONCAT('%', #{keyword}, '%')
+                    OR b.summary LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY b.is_top DESC, b.created_at DESC
+    </select>
+
+    <select id="selectBlogDetailById" resultType="com.voidpen.server.module.blog.model.response.BlogDetailVO">
+        SELECT
+            b.id,
+            b.user_id AS userId,
+            b.category_id AS categoryId,
+            b.title,
+            b.content,
+            b.cover_img AS coverImg,
+            b.summary,
+            b.views,
+            b.likes,
+            b.status,
+            b.is_top AS isTop,
+            b.is_featured AS isFeatured,
+            b.created_at AS createdAt,
+            b.updated_at AS updatedAt,
+            c.name AS categoryName,
+            COALESCE(u.nickname, u.username) AS authorName
+        FROM t_blog b
+        LEFT JOIN t_category c ON b.category_id = c.id
+        LEFT JOIN t_user u ON b.user_id = u.id
+        WHERE b.id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="selectFeaturedBlogs" resultType="com.voidpen.server.module.blog.model.response.BlogListVO">
+        SELECT
+            b.id,
+            b.user_id AS userId,
+            b.category_id AS categoryId,
+            b.title,
+            b.cover_img AS coverImg,
+            b.summary,
+            b.views,
+            b.likes,
+            b.status,
+            b.is_top AS isTop,
+            b.is_featured AS isFeatured,
+            b.created_at AS createdAt,
+            b.updated_at AS updatedAt,
+            c.name AS categoryName,
+            COALESCE(u.nickname, u.username) AS authorName
+        FROM t_blog b
+        LEFT JOIN t_category c ON b.category_id = c.id
+        LEFT JOIN t_user u ON b.user_id = u.id
+        WHERE b.status = 1 AND (b.is_top = 1 OR b.is_featured = 1)
+        ORDER BY b.is_top DESC, b.is_featured DESC, b.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <update id="incrementViews">
+        UPDATE t_blog
+        SET views = views + #{increment}
+        WHERE id = #{blogId}
+    </update>
+
+    <update id="incrementLikes">
+        UPDATE t_blog
+        SET likes = likes + 1
+        WHERE id = #{blogId}
+    </update>
+
+    <select id="selectArchiveBlogItems" resultType="com.voidpen.server.module.blog.model.response.ArchiveBlogItemVO">
+        SELECT
+            id,
+            title,
+            created_at AS createdAt
+        FROM t_blog
+        WHERE status = 1
+        ORDER BY created_at DESC
+    </select>
+</mapper>
