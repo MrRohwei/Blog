@@ -20,3 +20,6 @@ voidpen:
   jwt:
     secret: your-256-bit-secret-key-here-change-in-prod
     expire: 7200
+  oss:
+    base-url: http://localhost:${server.port}/uploads
+    local-dir: uploads

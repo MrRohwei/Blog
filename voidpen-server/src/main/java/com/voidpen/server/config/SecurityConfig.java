@@ -33,6 +33,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/admin/v1/auth/login").permitAll()
                 .requestMatchers(
                     "/doc.html",

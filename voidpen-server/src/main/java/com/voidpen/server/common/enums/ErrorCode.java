@@ -25,7 +25,18 @@ public enum ErrorCode {
     CATEGORY_HAS_BLOGS(3003, "该分类下存在博客，无法删除"),
 
     TAG_NOT_FOUND(4001, "标签不存在"),
-    TAG_DUPLICATE(4002, "标签名称已存在");
+    TAG_DUPLICATE(4002, "标签名称已存在"),
+
+    COMMENT_NOT_FOUND(5001, "评论不存在"),
+    COMMENT_GUEST_INFO_REQUIRED(5002, "访客昵称和邮箱不能为空"),
+
+    BANNER_NOT_FOUND(6001, "轮播图不存在"),
+
+    ADVERTISEMENT_NOT_FOUND(7001, "广告不存在"),
+    ADVERTISEMENT_POSITION_INVALID(7002, "广告位参数非法"),
+
+    FILE_TOO_LARGE(8001, "文件大小不能超过 5MB"),
+    FILE_UPLOAD_FAILED(8002, "文件上传失败");
 
     private final Integer code;
 
