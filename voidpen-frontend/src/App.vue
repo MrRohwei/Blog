@@ -1,6 +1,6 @@
 <template>
   <main class="app-shell">
     <h1>Voidpen Frontend</h1>
-    <p>Frontend app is initialized and ready for upcoming tasks.</p>
+    <p>前台展示项目骨架已就绪，网络请求层已封装。</p>
   </main>
 </template>
