@@ -5,6 +5,7 @@ import com.voidpen.server.common.constant.RedisKeys;
 import com.voidpen.server.common.enums.ErrorCode;
 import com.voidpen.server.common.exception.BusinessException;
 import com.voidpen.server.module.auth.model.request.LoginRequest;
+import com.voidpen.server.module.auth.model.request.UpdatePasswordRequest;
 import com.voidpen.server.module.auth.model.response.LoginResponse;
 import com.voidpen.server.module.auth.model.response.UserInfoVO;
 import com.voidpen.server.module.auth.service.AuthService;
@@ -77,5 +78,21 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
         return UserInfoVO.from(user);
+    }
+
+    @Override
+    public void updatePassword(Long userId, UpdatePasswordRequest request) {
+        TUser user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.PASSWORD_ERROR);
+        }
+
+        TUser toUpdate = new TUser()
+            .setId(userId)
+            .setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userMapper.updateById(toUpdate);
     }
 }

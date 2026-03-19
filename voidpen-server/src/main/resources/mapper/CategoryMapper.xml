@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voidpen.server.module.category.mapper.CategoryMapper">
+
+    <select id="selectAdminPageWithBlogCount" resultType="com.voidpen.server.module.category.model.response.CategoryVO">
+        SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.sort_order AS sortOrder,
+            c.status,
+            c.created_at AS createdAt,
+            c.updated_at AS updatedAt,
+            COUNT(b.id) AS blogCount
+        FROM t_category c
+        LEFT JOIN t_blog b ON c.id = b.category_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                c.name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        GROUP BY c.id, c.name, c.description, c.sort_order, c.status, c.created_at, c.updated_at
+        ORDER BY c.sort_order ASC, c.created_at DESC
+    </select>
+
+    <select id="selectEnabledWithBlogCount" resultType="com.voidpen.server.module.category.model.response.CategoryVO">
+        SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.sort_order AS sortOrder,
+            c.status,
+            c.created_at AS createdAt,
+            c.updated_at AS updatedAt,
+            COUNT(b.id) AS blogCount
+        FROM t_category c
+        LEFT JOIN t_blog b ON c.id = b.category_id AND b.status = 1
+        WHERE c.status = 1
+        GROUP BY c.id, c.name, c.description, c.sort_order, c.status, c.created_at, c.updated_at
+        ORDER BY c.sort_order ASC, c.created_at DESC
+    </select>
+
+    <select id="countBlogsByCategoryId" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM t_blog
+        WHERE category_id = #{categoryId}
+    </select>
+</mapper>

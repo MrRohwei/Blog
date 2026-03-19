@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voidpen.server.module.tag.mapper.TagMapper">
+
+    <select id="selectAdminPageWithBlogCount" resultType="com.voidpen.server.module.tag.model.response.TagVO">
+        SELECT
+            t.id,
+            t.name,
+            t.color,
+            t.created_at AS createdAt,
+            COUNT(DISTINCT bt.blog_id) AS blogCount
+        FROM t_tag t
+        LEFT JOIN t_blog_tag bt ON t.id = bt.tag_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                t.name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        GROUP BY t.id, t.name, t.color, t.created_at
+        ORDER BY t.created_at DESC
+    </select>
+
+    <select id="selectPublicListWithBlogCount" resultType="com.voidpen.server.module.tag.model.response.TagVO">
+        SELECT
+            t.id,
+            t.name,
+            t.color,
+            t.created_at AS createdAt,
+            COUNT(DISTINCT CASE WHEN b.status = 1 THEN b.id END) AS blogCount
+        FROM t_tag t
+        LEFT JOIN t_blog_tag bt ON t.id = bt.tag_id
+        LEFT JOIN t_blog b ON bt.blog_id = b.id
+        GROUP BY t.id, t.name, t.color, t.created_at
+        ORDER BY t.created_at DESC
+    </select>
+
+    <delete id="deleteBlogTagRelationsByTagId">
+        DELETE FROM t_blog_tag WHERE tag_id = #{tagId}
+    </delete>
+</mapper>

@@ -4,6 +4,7 @@ import com.voidpen.server.common.enums.ErrorCode;
 import com.voidpen.server.common.exception.BusinessException;
 import com.voidpen.server.common.response.Result;
 import com.voidpen.server.module.auth.model.request.LoginRequest;
+import com.voidpen.server.module.auth.model.request.UpdatePasswordRequest;
 import com.voidpen.server.module.auth.model.response.LoginResponse;
 import com.voidpen.server.module.auth.model.response.UserInfoVO;
 import com.voidpen.server.module.auth.service.AuthService;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,6 +48,13 @@ public class AuthController {
     @GetMapping("/info")
     public Result<UserInfoVO> info() {
         return Result.success(authService.getUserInfo(currentUserId()));
+    }
+
+    @Operation(summary = "修改当前用户密码")
+    @PutMapping("/password")
+    public Result<Void> updatePassword(@RequestBody @Valid UpdatePasswordRequest request) {
+        authService.updatePassword(currentUserId(), request);
+        return Result.success();
     }
 
     private Long currentUserId() {
