@@ -7,8 +7,6 @@ spring:
     property-naming-strategy: com.fasterxml.jackson.databind.PropertyNamingStrategies$LowerCamelCaseStrategy
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 server:
   port: 8080

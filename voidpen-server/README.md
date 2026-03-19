@@ -21,6 +21,8 @@ mvn spring-boot:run
 
 接口文档：`http://localhost:8080/doc.html`
 
+数据库初始化脚本：`sql/init.sql`
+
 ## 打包
 
 ```bash

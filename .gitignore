@@ -16,6 +16,7 @@ Thumbs.db
 # Java / Maven / Gradle
 webssh-backend/target/
 **/target/
+**/.m2/
 *.class
 *.jar
 *.war
