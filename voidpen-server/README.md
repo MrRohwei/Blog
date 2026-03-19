@@ -17,6 +17,10 @@ mvn spring-boot:run
 
 默认端口：`8080`
 
+默认环境：`dev`（配置文件：`application-dev.yml`）
+
+接口文档：`http://localhost:8080/doc.html`
+
 ## 打包
 
 ```bash

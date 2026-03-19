@@ -3,8 +3,6 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-application-prod.yml
-src/main/resources/application-prod.yml
 .env
 .env.*
 !.env.example
