@@ -36,7 +36,8 @@ public enum ErrorCode {
     ADVERTISEMENT_POSITION_INVALID(7002, "广告位参数非法"),
 
     FILE_TOO_LARGE(8001, "文件大小不能超过 5MB"),
-    FILE_UPLOAD_FAILED(8002, "文件上传失败");
+    FILE_UPLOAD_FAILED(8002, "文件上传失败"),
+    FILE_TYPE_NOT_ALLOWED(8003, "仅支持上传 JPG/PNG/GIF/WebP 图片");
 
     private final Integer code;
 

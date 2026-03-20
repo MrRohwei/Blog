@@ -3,6 +3,7 @@ package com.voidpen.server.module.comment.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import cn.hutool.http.HtmlUtil;
 import com.voidpen.server.common.enums.ErrorCode;
 import com.voidpen.server.common.exception.BusinessException;
 import com.voidpen.server.common.response.PageResult;
@@ -88,7 +89,7 @@ public class CommentServiceImpl implements CommentService {
         TComment comment = new TComment()
             .setBlogId(request.getBlogId())
             .setParentId(request.getParentId())
-            .setContent(request.getContent())
+            .setContent(HtmlUtil.cleanHtmlTag(request.getContent()))
             .setStatus(STATUS_PENDING);
 
         if (userId != null) {

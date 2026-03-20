@@ -10,6 +10,24 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return
+          }
+          if (id.includes('marked') || id.includes('highlight.js') || id.includes('dompurify')) {
+            return 'markdown'
+          }
+          if (id.includes('vue-router') || id.includes('axios') || id.includes('/vue/')) {
+            return 'vendor'
+          }
+        },
+      },
+    },
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,

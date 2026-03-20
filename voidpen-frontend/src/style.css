@@ -5,31 +5,63 @@
 body {
   margin: 0;
   font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #f8fafc;
-  color: #1f2937;
+  background:
+    radial-gradient(circle at 10% -10%, color-mix(in srgb, var(--accent), white 88%), transparent 44%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent-2), white 88%), transparent 40%),
+    var(--bg);
+  color: var(--text-main);
+  line-height: 1.65;
 }
 
 #app {
   min-height: 100vh;
 }
 
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.75rem;
+:root {
+  --bg: #f3f6fb;
+  --surface: #ffffff;
+  --surface-subtle: #f8fbff;
+  --text-main: #142436;
+  --text-soft: #60778f;
+  --accent: #1976d2;
+  --accent-2: #2f8f83;
+  --border: #d9e5f1;
+  --shadow-soft: 0 12px 30px rgba(25, 118, 210, 0.12);
+  --font-display: 'ZCOOL XiaoWei', 'STKaiti', 'KaiTi', serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+
+img {
+  max-width: 100%;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-main);
+}
+
+.empty-hint {
+  color: var(--text-soft);
   text-align: center;
-  padding: 1.5rem;
-}
-
-h1 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-p {
-  margin: 0;
-  color: #4b5563;
+  padding: 30px 12px;
 }
