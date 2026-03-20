@@ -30,6 +30,7 @@ cp .env.example .env
 ## 3. 一键启动
 
 ```bash
+mkdir -p volumes/mysql volumes/redis volumes/uploads volumes/server-logs volumes/frontend-nginx-logs volumes/admin-nginx-logs
 docker compose up -d --build
 ```
 
@@ -78,3 +79,10 @@ docker compose down -v
 ## 6. 生产上线（CI/CD + Nginx）
 
 见：`deploy/README.md`
+
+## 7. 挂载目录（建议备份）
+
+- `volumes/mysql`
+- `volumes/redis`
+- `volumes/uploads`
+- `volumes/server-logs`

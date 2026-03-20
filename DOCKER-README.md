@@ -15,6 +15,7 @@ Copy-Item .env.example .env
 ## 2. 一键启动
 
 ```bash
+mkdir -p volumes/mysql volumes/redis volumes/uploads volumes/server-logs volumes/frontend-nginx-logs volumes/admin-nginx-logs
 docker compose up -d --build
 ```
 
@@ -38,3 +39,12 @@ docker compose logs -f server
 docker compose down
 docker compose down -v
 ```
+
+## 5. 重要挂载目录
+
+- `./volumes/mysql`：MySQL 数据
+- `./volumes/redis`：Redis 数据
+- `./volumes/uploads`：上传文件
+- `./volumes/server-logs`：后端日志文件
+- `./volumes/frontend-nginx-logs`：前台 Nginx 日志
+- `./volumes/admin-nginx-logs`：后台 Nginx 日志

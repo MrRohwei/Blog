@@ -42,3 +42,8 @@ coverage/
 
 # Local reference assets
 images/
+
+# Docker bind-mounted runtime data
+volumes/**
+!volumes/**/
+!volumes/**/.gitkeep
