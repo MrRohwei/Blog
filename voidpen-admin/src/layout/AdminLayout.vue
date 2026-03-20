@@ -52,6 +52,8 @@ const menuItems = [
   { path: '/user', label: '用户管理' },
   { path: '/banner', label: '轮播图管理' },
   { path: '/advertisement', label: '广告管理' },
+  { path: '/system/config', label: '系统配置' },
+  { path: '/system/monitor', label: '运行监控' },
 ]
 
 const activeMenu = computed(() => {

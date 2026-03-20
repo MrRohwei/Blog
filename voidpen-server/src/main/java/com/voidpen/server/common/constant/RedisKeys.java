@@ -9,4 +9,8 @@ public interface RedisKeys {
     String BLOG_DETAIL = "voidpen:blog:detail:";
 
     String BLOG_LIKE = "voidpen:blog:like:";
+
+    String SYSTEM_CONFIG = "voidpen:system:config:";
+
+    String SYSTEM_CACHE_CLEAR_ALL_COOLDOWN = "voidpen:system:cache:clearall:cooldown";
 }

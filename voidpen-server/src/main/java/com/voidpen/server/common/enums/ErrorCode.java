@@ -37,7 +37,13 @@ public enum ErrorCode {
 
     FILE_TOO_LARGE(8001, "文件大小不能超过 5MB"),
     FILE_UPLOAD_FAILED(8002, "文件上传失败"),
-    FILE_TYPE_NOT_ALLOWED(8003, "仅支持上传 JPG/PNG/GIF/WebP 图片");
+    FILE_TYPE_NOT_ALLOWED(8003, "仅支持上传 JPG/PNG/GIF/WebP 图片"),
+
+    SYSTEM_CONFIG_NOT_FOUND(9001, "系统配置不存在"),
+    SYSTEM_CONFIG_NOT_EDITABLE(9002, "该配置不允许编辑"),
+    SYSTEM_CONFIG_VALUE_INVALID(9003, "配置值格式不合法"),
+    SYSTEM_CACHE_PREFIX_INVALID(9004, "缓存前缀不合法"),
+    SYSTEM_CACHE_CLEAR_TOO_FREQUENT(9005, "全量清理操作过于频繁，请稍后重试");
 
     private final Integer code;
 

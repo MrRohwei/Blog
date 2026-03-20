@@ -109,6 +109,67 @@ CREATE TABLE IF NOT EXISTS t_advertisement (
     updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 系统配置表
+CREATE TABLE IF NOT EXISTS t_system_config (
+    id           BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    config_group VARCHAR(50)  NOT NULL,
+    config_key   VARCHAR(100) NOT NULL,
+    config_value TEXT,
+    value_type   VARCHAR(20)  NOT NULL DEFAULT 'string',
+    description  VARCHAR(255),
+    editable     TINYINT      NOT NULL DEFAULT 1,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_group_key (config_group, config_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 系统运维操作日志表
+CREATE TABLE IF NOT EXISTS t_system_operation_log (
+    id             BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    operator_id    BIGINT,
+    operation_type VARCHAR(50)  NOT NULL,
+    target_scope   VARCHAR(200) NOT NULL,
+    detail         VARCHAR(500),
+    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO t_system_config (config_group, config_key, config_value, value_type, description, editable)
+SELECT 'site', 'title', 'Voidpen Blog', 'string', '站点标题', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM t_system_config WHERE config_group = 'site' AND config_key = 'title'
+);
+
+INSERT INTO t_system_config (config_group, config_key, config_value, value_type, description, editable)
+SELECT 'site', 'subtitle', '记录与分享', 'string', '站点副标题', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM t_system_config WHERE config_group = 'site' AND config_key = 'subtitle'
+);
+
+INSERT INTO t_system_config (config_group, config_key, config_value, value_type, description, editable)
+SELECT 'seo', 'keywords', 'Voidpen,博客,技术分享', 'string', 'SEO 关键词', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM t_system_config WHERE config_group = 'seo' AND config_key = 'keywords'
+);
+
+INSERT INTO t_system_config (config_group, config_key, config_value, value_type, description, editable)
+SELECT 'comment', 'autoAudit', 'false', 'boolean', '评论自动审核', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM t_system_config WHERE config_group = 'comment' AND config_key = 'autoAudit'
+);
+
+INSERT INTO t_system_config (config_group, config_key, config_value, value_type, description, editable)
+SELECT 'upload', 'maxSizeMb', '10', 'number', '上传文件大小限制（MB）', 0
+WHERE NOT EXISTS (
+    SELECT 1 FROM t_system_config WHERE config_group = 'upload' AND config_key = 'maxSizeMb'
+);
+
+INSERT INTO t_system_config (config_group, config_key, config_value, value_type, description, editable)
+SELECT 'feature', 'enableRegister', 'true', 'boolean', '开启前台注册功能', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM t_system_config WHERE config_group = 'feature' AND config_key = 'enableRegister'
+);
+
 -- 初始管理员账号（admin123）
 INSERT INTO t_user (username, password, nickname, role, status)
 SELECT 'admin', '$2a$10$.KvG7EENAfCtYJ/HLoAyce6YomL1x0PbBl66WScKjHb8/H8ORPbF6', '管理员', 'ROLE_ADMIN', 1

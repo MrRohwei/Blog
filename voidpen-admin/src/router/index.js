@@ -75,6 +75,18 @@ const routes = [
         component: () => import('@/views/advertisement/AdvertisementView.vue'),
         meta: { title: '广告管理' },
       },
+      {
+        path: 'system/config',
+        name: 'system-config',
+        component: () => import('@/views/system/SystemConfigView.vue'),
+        meta: { title: '系统配置' },
+      },
+      {
+        path: 'system/monitor',
+        name: 'system-monitor',
+        component: () => import('@/views/system/SystemMonitorView.vue'),
+        meta: { title: '运行监控' },
+      },
     ],
   },
   {
