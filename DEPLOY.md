@@ -74,3 +74,7 @@ docker compose down
 ```bash
 docker compose down -v
 ```
+
+## 6. 生产上线（CI/CD + Nginx）
+
+见：`deploy/README.md`
