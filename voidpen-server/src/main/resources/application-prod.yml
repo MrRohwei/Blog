@@ -23,3 +23,5 @@ voidpen:
   jwt:
     secret: ${VOIDPEN_JWT_SECRET}
     expire: ${VOIDPEN_JWT_EXPIRE:7200}
+  cors:
+    allowed-origins: ${VOIDPEN_CORS_ALLOWED_ORIGINS:https://yourdomain.com,https://admin.yourdomain.com}

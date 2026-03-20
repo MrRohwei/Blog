@@ -6,16 +6,26 @@
     </header>
 
     <div class="timeline card">
-      <div v-if="archives.length === 0" class="empty-hint">暂无归档数据</div>
-      <div v-for="item in archives" :key="`${item.year}-${item.month}`" class="month-block">
-        <div class="month-title">{{ item.year }} 年 {{ item.month }} 月（{{ item.count }}）</div>
-        <ul>
-          <li v-for="blog in item.blogs || []" :key="blog.id">
-            <span>{{ formatDate(blog.createdAt) }}</span>
-            <router-link :to="`/blog/${blog.id}`">{{ blog.title }}</router-link>
-          </li>
-        </ul>
-      </div>
+      <template v-if="loading">
+        <div v-for="item in [1, 2, 3]" :key="item" class="month-block skeleton-block">
+          <div class="skeleton-line title-line" />
+          <div class="skeleton-line" />
+          <div class="skeleton-line short" />
+        </div>
+      </template>
+      <div v-else-if="errorMessage" class="empty-hint">{{ errorMessage }}</div>
+      <template v-else>
+        <div v-if="archives.length === 0" class="empty-hint">暂无归档数据</div>
+        <div v-for="item in archives" :key="`${item.year}-${item.month}`" class="month-block">
+          <div class="month-title">{{ item.year }} 年 {{ item.month }} 月（{{ item.count }}）</div>
+          <ul>
+            <li v-for="blog in item.blogs || []" :key="blog.id">
+              <span>{{ formatDate(blog.createdAt) }}</span>
+              <router-link :to="`/blog/${blog.id}`">{{ blog.title }}</router-link>
+            </li>
+          </ul>
+        </div>
+      </template>
     </div>
   </section>
 </template>
@@ -25,6 +35,8 @@ import { ref } from 'vue'
 import { getArchiveBlogs } from '@/api/blog'
 
 const archives = ref([])
+const loading = ref(true)
+const errorMessage = ref('')
 
 function formatDate(value) {
   if (!value) {
@@ -33,9 +45,17 @@ function formatDate(value) {
   return String(value).replace('T', ' ').slice(5, 16)
 }
 
-getArchiveBlogs().then((data) => {
-  archives.value = data || []
-})
+getArchiveBlogs()
+  .then((data) => {
+    archives.value = data || []
+  })
+  .catch((error) => {
+    errorMessage.value = error?.message || '归档加载失败，请稍后重试'
+    archives.value = []
+  })
+  .finally(() => {
+    loading.value = false
+  })
 </script>
 
 <style scoped>
@@ -62,6 +82,29 @@ getArchiveBlogs().then((data) => {
 .month-block {
   border-left: 2px solid var(--border);
   padding-left: 14px;
+}
+
+.skeleton-block {
+  border-left: none;
+  padding-left: 0;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #eef3f8 25%, #e4ebf3 37%, #eef3f8 63%);
+  background-size: 400% 100%;
+  animation: skeleton 1.2s ease infinite;
+}
+
+.skeleton-line.title-line {
+  height: 18px;
+  width: 44%;
+}
+
+.skeleton-line.short {
+  width: 52%;
 }
 
 .month-title {
@@ -100,6 +143,15 @@ li a {
 
   li span {
     width: auto;
+  }
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
   }
 }
 </style>

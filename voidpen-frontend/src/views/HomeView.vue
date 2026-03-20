@@ -4,8 +4,14 @@
 
     <div class="content-wrap">
       <main class="main-content">
-        <BlogList :blogs="blogs" />
-        <AppPagination v-model:page="query.page" :size="query.size" :total="total" @update:page="loadBlogs" />
+        <BlogList :blogs="blogs" :loading="loading.blogs" :error-message="errors.blogs" @retry="loadBlogs" />
+        <AppPagination
+          v-if="!loading.blogs && total > 0"
+          v-model:page="query.page"
+          :size="query.size"
+          :total="total"
+          @update:page="loadBlogs"
+        />
       </main>
 
       <aside class="sidebar">
@@ -47,11 +53,27 @@ const banners = ref([])
 const categories = ref([])
 const tags = ref([])
 const featuredBlogs = ref([])
+const loading = reactive({
+  blogs: false,
+})
+const errors = reactive({
+  blogs: '',
+})
 
 async function loadBlogs() {
-  const data = await getBlogPage(query)
-  blogs.value = data.records || []
-  total.value = data.total || 0
+  loading.blogs = true
+  errors.blogs = ''
+  try {
+    const data = await getBlogPage(query)
+    blogs.value = data.records || []
+    total.value = data.total || 0
+  } catch (error) {
+    blogs.value = []
+    total.value = 0
+    errors.blogs = error?.message || '文章加载失败，请稍后重试'
+  } finally {
+    loading.blogs = false
+  }
 }
 
 async function loadSidebarData() {

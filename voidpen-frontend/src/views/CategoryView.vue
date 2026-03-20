@@ -7,8 +7,14 @@
 
     <div class="content-wrap">
       <main>
-        <BlogList :blogs="blogs" />
-        <AppPagination v-model:page="query.page" :size="query.size" :total="total" @update:page="loadData" />
+        <BlogList :blogs="blogs" :loading="loading.blogs" :error-message="errors.blogs" @retry="loadData" />
+        <AppPagination
+          v-if="!loading.blogs && total > 0"
+          v-model:page="query.page"
+          :size="query.size"
+          :total="total"
+          @update:page="loadData"
+        />
       </main>
       <aside class="sidebar">
         <CategoryCard :categories="categories" />
@@ -36,6 +42,12 @@ const categories = ref([])
 const tags = ref([])
 const blogs = ref([])
 const total = ref(0)
+const loading = reactive({
+  blogs: false,
+})
+const errors = reactive({
+  blogs: '',
+})
 
 const query = reactive({
   page: Number(route.query.page) || 1,
@@ -47,13 +59,23 @@ const currentCategory = computed(() =>
 )
 
 async function loadData() {
-  const data = await getBlogPage({
-    page: query.page,
-    size: query.size,
-    categoryId: route.params.id,
-  })
-  blogs.value = data.records || []
-  total.value = data.total || 0
+  loading.blogs = true
+  errors.blogs = ''
+  try {
+    const data = await getBlogPage({
+      page: query.page,
+      size: query.size,
+      categoryId: route.params.id,
+    })
+    blogs.value = data.records || []
+    total.value = data.total || 0
+  } catch (error) {
+    blogs.value = []
+    total.value = 0
+    errors.blogs = error?.message || '文章加载失败，请稍后重试'
+  } finally {
+    loading.blogs = false
+  }
 }
 
 async function loadSideData() {

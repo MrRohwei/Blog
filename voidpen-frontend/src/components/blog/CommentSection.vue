@@ -31,6 +31,7 @@ import { reactive, ref, watch } from 'vue'
 import DOMPurify from 'dompurify'
 import CommentItem from '@/components/blog/CommentItem.vue'
 import { getComments, postComment } from '@/api/comment'
+import { pushToast } from '@/utils/toast'
 
 const props = defineProps({
   blogId: {
@@ -57,25 +58,29 @@ function setReply(comment) {
 }
 
 async function loadComments() {
-  comments.value = await getComments(props.blogId)
+  try {
+    comments.value = await getComments(props.blogId)
+  } catch {
+    comments.value = []
+  }
 }
 
 async function submitComment() {
   if (!form.nickname) {
-    window.alert('请填写昵称')
+    pushToast('请填写昵称', 'info')
     return
   }
   if (!form.content) {
-    window.alert('请输入评论内容')
+    pushToast('请输入评论内容', 'info')
     return
   }
   if (!form.email) {
-    window.alert('请填写邮箱')
+    pushToast('请填写邮箱', 'info')
     return
   }
   const safeContent = DOMPurify.sanitize(form.content, { ALLOWED_TAGS: [] })
   if (!safeContent) {
-    window.alert('评论内容无效')
+    pushToast('评论内容无效', 'info')
     return
   }
 
@@ -90,7 +95,7 @@ async function submitComment() {
     })
     form.content = ''
     clearReply()
-    window.alert('评论已提交，审核通过后展示')
+    pushToast('评论已提交，审核通过后展示', 'success')
   } finally {
     submitting.value = false
   }
@@ -181,6 +186,10 @@ textarea {
 @media (max-width: 640px) {
   .guest-fields {
     grid-template-columns: 1fr;
+  }
+
+  .form-actions button {
+    width: 100%;
   }
 }
 </style>

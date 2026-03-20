@@ -39,3 +39,6 @@ coverage/
 
 # Local archives
 *.zip
+
+# Local reference assets
+images/

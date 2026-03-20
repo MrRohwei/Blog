@@ -10,6 +10,30 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return
+          }
+          if (
+            id.includes('md-editor-v3') ||
+            id.includes('@codemirror') ||
+            id.includes('@lezer') ||
+            id.includes('/codemirror/')
+          ) {
+            return 'md-editor'
+          }
+          if (id.includes('element-plus') || id.includes('@element-plus/icons-vue')) {
+            return 'element-plus'
+          }
+          return 'vendor'
+        },
+      },
+    },
+  },
   server: {
     host: '0.0.0.0',
     port: 5174,

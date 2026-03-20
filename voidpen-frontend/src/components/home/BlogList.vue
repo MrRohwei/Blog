@@ -1,47 +1,80 @@
 <template>
   <section class="blog-list">
-    <article v-for="item in blogs" :key="item.id" class="blog-item card">
-      <router-link :to="`/blog/${item.id}`" class="cover-link">
-        <img v-if="item.coverImg" :src="item.coverImg" :alt="item.title" loading="lazy" />
-        <div v-else class="cover-placeholder">{{ item.title }}</div>
-      </router-link>
-
-      <div class="content">
-        <router-link :to="`/blog/${item.id}`" class="title">{{ item.title }}</router-link>
-        <p class="summary">{{ item.summary || '暂无摘要，点击阅读全文。' }}</p>
-
-        <div class="meta">
-          <router-link :to="`/category/${item.categoryId}`">{{ item.categoryName || '未分类' }}</router-link>
-          <span>{{ item.views || 0 }} 阅读</span>
-          <span>{{ item.likes || 0 }} 点赞</span>
-          <span>{{ formatDate(item.createdAt) }}</span>
+    <template v-if="loading">
+      <article v-for="item in skeletonList" :key="item" class="blog-item card skeleton-item">
+        <div class="cover-skeleton skeleton-block" />
+        <div class="content">
+          <div class="skeleton-line title-line" />
+          <div class="skeleton-line" />
+          <div class="skeleton-line" />
+          <div class="skeleton-line short" />
         </div>
+      </article>
+    </template>
 
-        <div class="tags">
-          <router-link
-            v-for="tag in item.tags || []"
-            :key="tag.id"
-            :to="`/tag/${tag.id}`"
-            class="tag-item"
-            :style="{ borderColor: tag.color || '#cbd5e1' }"
-          >
-            {{ tag.name }}
-          </router-link>
+    <div v-else-if="errorMessage" class="card empty-hint">
+      {{ errorMessage }}
+      <button type="button" class="retry-btn" @click="emit('retry')">重新加载</button>
+    </div>
+
+    <template v-else>
+      <article v-for="item in blogs" :key="item.id" class="blog-item card">
+        <router-link :to="`/blog/${item.id}`" class="cover-link">
+          <img v-if="item.coverImg" :src="item.coverImg" :alt="item.title" loading="lazy" />
+          <div v-else class="cover-placeholder">{{ item.title }}</div>
+        </router-link>
+
+        <div class="content">
+          <router-link :to="`/blog/${item.id}`" class="title">{{ item.title }}</router-link>
+          <p class="summary">{{ item.summary || '暂无摘要，点击阅读全文。' }}</p>
+
+          <div class="meta">
+            <router-link :to="`/category/${item.categoryId}`">{{ item.categoryName || '未分类' }}</router-link>
+            <span>{{ item.views || 0 }} 阅读</span>
+            <span>{{ item.likes || 0 }} 点赞</span>
+            <span>{{ formatDate(item.createdAt) }}</span>
+          </div>
+
+          <div class="tags">
+            <router-link
+              v-for="tag in item.tags || []"
+              :key="tag.id"
+              :to="`/tag/${tag.id}`"
+              class="tag-item"
+              :style="{ borderColor: tag.color || '#cbd5e1' }"
+            >
+              {{ tag.name }}
+            </router-link>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
 
-    <div v-if="blogs.length === 0" class="card empty-hint">暂无文章</div>
+      <div v-if="blogs.length === 0" class="card empty-hint">暂无文章</div>
+    </template>
   </section>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   blogs: {
     type: Array,
     default: () => [],
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  errorMessage: {
+    type: String,
+    default: '',
+  },
 })
+
+const emit = defineEmits(['retry'])
+
+const skeletonList = computed(() => [1, 2, 3])
 
 function formatDate(value) {
   if (!value) {
@@ -62,6 +95,36 @@ function formatDate(value) {
   display: grid;
   grid-template-columns: 240px 1fr;
   overflow: hidden;
+}
+
+.skeleton-item {
+  min-height: 180px;
+}
+
+.skeleton-block,
+.skeleton-line {
+  background: linear-gradient(90deg, #eef3f8 25%, #e4ebf3 37%, #eef3f8 63%);
+  background-size: 400% 100%;
+  animation: skeleton 1.2s ease infinite;
+}
+
+.cover-skeleton {
+  min-height: 170px;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.title-line {
+  height: 18px;
+  width: 68%;
+}
+
+.skeleton-line.short {
+  width: 45%;
 }
 
 .cover-link {
@@ -129,6 +192,25 @@ function formatDate(value) {
   padding: 3px 9px;
   font-size: 12px;
   color: var(--text-soft);
+}
+
+.retry-btn {
+  margin-top: 10px;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 @media (max-width: 900px) {

@@ -24,6 +24,8 @@ voidpen:
   jwt:
     secret: your-256-bit-secret-key-here-change-in-prod
     expire: 7200
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:5174
   oss:
     base-url: http://localhost:${server.port}/uploads
     local-dir: uploads

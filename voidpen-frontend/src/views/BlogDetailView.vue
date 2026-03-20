@@ -1,38 +1,70 @@
 <template>
   <div class="detail-layout">
     <article class="card article">
-      <h1>{{ blog.title }}</h1>
+      <template v-if="loading">
+        <div class="skeleton-line headline" />
+        <div class="skeleton-line" />
+        <div class="skeleton-line short" />
+        <div class="skeleton-box" />
+      </template>
 
-      <div class="meta">
-        <span>{{ formatDate(blog.createdAt) }}</span>
-        <span>{{ blog.views || 0 }} 次阅读</span>
-        <router-link :to="`/category/${blog.categoryId}`">{{ blog.categoryName || '未分类' }}</router-link>
-      </div>
+      <template v-else-if="loadError">
+        <div class="empty-hint">{{ loadError }}</div>
+      </template>
 
-      <div class="markdown-body" v-html="contentHtml" />
+      <template v-else>
+        <h1>{{ blog.title }}</h1>
 
-      <div class="footer-actions">
-        <div class="tags">
-          <router-link
-            v-for="tag in blog.tags || []"
-            :key="tag.id"
-            :to="`/tag/${tag.id}`"
-            class="tag"
-            :style="{ borderColor: tag.color || '#cbd5e1' }"
-          >
-            {{ tag.name }}
-          </router-link>
+        <div class="meta">
+          <span>{{ formatDate(blog.createdAt) }}</span>
+          <span>{{ blog.views || 0 }} 次阅读</span>
+          <router-link :to="`/category/${blog.categoryId}`">{{ blog.categoryName || '未分类' }}</router-link>
         </div>
-        <LikeButton v-if="blog.id" :blog-id="blog.id" :count="blog.likes || 0" />
-      </div>
 
-      <AdvertisementWidget position="DETAIL_BOTTOM" />
-      <CommentSection v-if="blog.id" :blog-id="blog.id" />
+        <div class="markdown-body" v-html="contentHtml" />
+
+        <div class="footer-actions">
+          <div class="tags">
+            <router-link
+              v-for="tag in blog.tags || []"
+              :key="tag.id"
+              :to="`/tag/${tag.id}`"
+              class="tag"
+              :style="{ borderColor: tag.color || '#cbd5e1' }"
+            >
+              {{ tag.name }}
+            </router-link>
+          </div>
+          <LikeButton v-if="blog.id" :blog-id="blog.id" :count="blog.likes || 0" />
+        </div>
+
+        <AdvertisementWidget position="DETAIL_BOTTOM" />
+        <CommentSection v-if="blog.id" :blog-id="blog.id" />
+      </template>
     </article>
 
-    <aside class="toc-sidebar">
+    <aside v-if="tocItems.length && !loading && !loadError" class="toc-sidebar">
       <TableOfContents :items="tocItems" v-model:active-id="activeTocId" />
     </aside>
+
+    <button
+      v-if="tocItems.length && !loading && !loadError"
+      type="button"
+      class="toc-fab"
+      @click="isTocPanelOpen = true"
+    >
+      目录
+    </button>
+
+    <div v-if="isTocPanelOpen" class="toc-overlay" @click.self="isTocPanelOpen = false">
+      <section class="toc-panel" @click="handleTocPanelClick">
+        <header class="toc-panel-header">
+          <strong>目录</strong>
+          <button type="button" @click="isTocPanelOpen = false">关闭</button>
+        </header>
+        <TableOfContents :items="tocItems" v-model:active-id="activeTocId" />
+      </section>
+    </div>
   </div>
 </template>
 
@@ -50,7 +82,7 @@ import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import { marked } from 'marked'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import 'highlight.js/styles/github.css'
 import CommentSection from '@/components/blog/CommentSection.vue'
@@ -60,6 +92,7 @@ import AdvertisementWidget from '@/components/common/AdvertisementWidget.vue'
 import { getBlogDetail } from '@/api/blog'
 
 const route = useRoute()
+const SEO_META_TAG = 'data-voidpen-meta'
 
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('css', css)
@@ -75,18 +108,32 @@ hljs.registerLanguage('yaml', yaml)
 const blog = ref({})
 const tocItems = ref([])
 const activeTocId = ref('')
+const loading = ref(false)
+const loadError = ref('')
+const isTocPanelOpen = ref(false)
 
 const contentHtml = computed(() => buildRenderedContent(blog.value.content || ''))
 
 async function loadBlog() {
-  blog.value = await getBlogDetail(route.params.id)
-  if (blog.value?.title) {
-    document.title = `${blog.value.title} - Voidpen`
+  loading.value = true
+  loadError.value = ''
+  isTocPanelOpen.value = false
+  try {
+    blog.value = await getBlogDetail(route.params.id)
+    applyBlogMeta(blog.value)
+  } catch (error) {
+    blog.value = {}
+    tocItems.value = []
+    activeTocId.value = ''
+    clearBlogMeta()
+    loadError.value = error?.message || '文章加载失败，请稍后重试'
+  } finally {
+    loading.value = false
   }
 }
 
-function buildRenderedContent(markdown) {
-  const html = marked.parse(markdown || '')
+function buildRenderedContent(markdownContent) {
+  const html = marked.parse(markdownContent || '')
   const sanitized = DOMPurify.sanitize(html)
   const parser = new DOMParser()
   const doc = parser.parseFromString(sanitized, 'text/html')
@@ -115,6 +162,41 @@ function buildRenderedContent(markdown) {
   return doc.body.innerHTML
 }
 
+function applyBlogMeta(blogData) {
+  const title = blogData?.title || '博客详情'
+  const summary = blogData?.summary || 'Voidpen 博客内容详情页'
+  const image = blogData?.coverImg || ''
+
+  document.title = `${title} - Voidpen`
+  upsertMeta('name', 'description', summary)
+  upsertMeta('property', 'og:title', title)
+  upsertMeta('property', 'og:description', summary)
+  upsertMeta('property', 'og:image', image)
+}
+
+function upsertMeta(key, name, content) {
+  let tag = document.head.querySelector(`meta[${key}="${name}"]`)
+  if (!tag) {
+    tag = document.createElement('meta')
+    tag.setAttribute(key, name)
+    document.head.appendChild(tag)
+  }
+  tag.setAttribute('content', content)
+  tag.setAttribute(SEO_META_TAG, 'blog-detail')
+}
+
+function clearBlogMeta() {
+  document.head
+    .querySelectorAll(`meta[${SEO_META_TAG}="blog-detail"]`)
+    .forEach((node) => node.remove())
+}
+
+function handleTocPanelClick(event) {
+  if (event.target.closest('a')) {
+    isTocPanelOpen.value = false
+  }
+}
+
 function formatDate(value) {
   if (!value) {
     return '-'
@@ -129,6 +211,10 @@ watch(
   },
   { immediate: true },
 )
+
+onBeforeUnmount(() => {
+  clearBlogMeta()
+})
 </script>
 
 <style scoped>
@@ -209,13 +295,97 @@ h1 {
   align-self: start;
 }
 
+.toc-fab {
+  display: none;
+}
+
+.toc-overlay {
+  display: none;
+}
+
+.skeleton-line,
+.skeleton-box {
+  background: linear-gradient(90deg, #eef3f8 25%, #e4ebf3 37%, #eef3f8 63%);
+  background-size: 400% 100%;
+  animation: skeleton 1.2s ease infinite;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.skeleton-line.headline {
+  height: 36px;
+  width: 78%;
+}
+
+.skeleton-line.short {
+  width: 55%;
+}
+
+.skeleton-box {
+  margin-top: 16px;
+  height: 280px;
+  border-radius: 14px;
+}
+
 @media (max-width: 1024px) {
   .detail-layout {
     grid-template-columns: 1fr;
   }
 
   .toc-sidebar {
-    position: static;
+    display: none;
+  }
+
+  .toc-fab {
+    position: fixed;
+    right: 14px;
+    bottom: 16px;
+    z-index: 40;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 14px;
+    display: inline-flex;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .toc-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(15, 23, 42, 0.45);
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .toc-panel {
+    width: min(640px, 100%);
+    max-height: 72vh;
+    overflow: auto;
+    background: var(--surface);
+    border-radius: 16px 16px 0 0;
+    border: 1px solid var(--border);
+    padding: 12px;
+  }
+
+  .toc-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .toc-panel-header button {
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
   }
 }
 
@@ -226,6 +396,20 @@ h1 {
 
   h1 {
     font-size: 28px;
+  }
+
+  .footer-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
   }
 }
 </style>
