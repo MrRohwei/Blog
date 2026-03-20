@@ -17,6 +17,9 @@
         </el-breadcrumb>
 
         <div class="user-area">
+          <el-link :href="frontendHomeUrl" target="_blank" type="primary" class="front-link">
+            访问前台
+          </el-link>
           <span class="nickname">{{ displayName }}</span>
           <el-button link type="primary" @click="handleLogout">退出登录</el-button>
         </div>
@@ -34,6 +37,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
+import { resolveFrontendUrl } from '@/utils/site'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,6 +66,8 @@ const breadcrumbItems = computed(() => route.matched.filter((item) => item.meta?
 const displayName = computed(() => {
   return userStore.userInfo?.nickname || userStore.userInfo?.username || '管理员'
 })
+
+const frontendHomeUrl = computed(() => resolveFrontendUrl('/'))
 
 async function handleLogout() {
   await userStore.logout()
@@ -128,6 +134,10 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.front-link {
+  font-size: 13px;
 }
 
 .nickname {

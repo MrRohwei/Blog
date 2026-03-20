@@ -12,6 +12,10 @@ Windows PowerShell:
 Copy-Item .env.example .env
 ```
 
+可按需修改：
+
+- `FRONTEND_BASE_URL`：后台「访问前台」按钮与博客标题跳转的前台地址
+
 ## 2. 一键启动
 
 ```bash

@@ -84,7 +84,7 @@ import yaml from 'highlight.js/lib/languages/yaml'
 import { marked } from 'marked'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import 'highlight.js/styles/github.css'
+import 'highlight.js/styles/github-dark.css'
 import CommentSection from '@/components/blog/CommentSection.vue'
 import LikeButton from '@/components/blog/LikeButton.vue'
 import TableOfContents from '@/components/blog/TableOfContents.vue'
@@ -152,14 +152,42 @@ function buildRenderedContent(markdownContent) {
 
   doc.querySelectorAll('pre code').forEach((block) => {
     const code = block.textContent || ''
-    const result = hljs.highlightAuto(code)
+    const preferredLanguage = parsePreferredLanguage(block.className)
+    const canUsePreferredLanguage = preferredLanguage && hljs.getLanguage(preferredLanguage)
+    const result = canUsePreferredLanguage
+      ? hljs.highlight(code, { language: preferredLanguage, ignoreIllegals: true })
+      : hljs.highlightAuto(code)
+    const languageLabel = normalizeLanguageLabel(preferredLanguage || result.language)
+
     block.innerHTML = result.value
     block.classList.add('hljs')
+    const pre = block.parentElement
+    if (pre) {
+      pre.classList.add('code-window')
+      pre.dataset.lang = languageLabel
+    }
   })
 
   tocItems.value = toc
   activeTocId.value = toc[0]?.id || ''
   return doc.body.innerHTML
+}
+
+function parsePreferredLanguage(classNames) {
+  const classes = String(classNames || '').split(/\s+/).filter(Boolean)
+  const languageClass = classes.find((item) => item.startsWith('language-'))
+  if (!languageClass) {
+    return ''
+  }
+  return languageClass.replace('language-', '').toLowerCase()
+}
+
+function normalizeLanguageLabel(language) {
+  const normalized = String(language || '').trim()
+  if (!normalized) {
+    return 'TEXT'
+  }
+  return normalized.toUpperCase()
 }
 
 function applyBlogMeta(blogData) {
@@ -253,14 +281,62 @@ h1 {
 }
 
 :deep(.markdown-body pre) {
-  overflow: auto;
-  border-radius: 10px;
-  padding: 12px;
+  overflow: hidden;
+  border-radius: 14px;
+  margin: 18px 0;
+}
+
+:deep(.markdown-body pre.code-window) {
+  position: relative;
+  padding-top: 40px;
   background: #0f172a;
+  border: 1px solid #233145;
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.24);
+}
+
+:deep(.markdown-body pre.code-window::before) {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff5f56;
+  box-shadow:
+    16px 0 0 #ffbd2e,
+    32px 0 0 #27c93f;
+}
+
+:deep(.markdown-body pre.code-window::after) {
+  content: attr(data-lang);
+  position: absolute;
+  right: 14px;
+  top: 10px;
+  color: #9fb5cc;
+  font-size: 11px;
+  letter-spacing: 0.08em;
 }
 
 :deep(.markdown-body code) {
   font-family: 'JetBrains Mono', 'Cascadia Mono', monospace;
+}
+
+:deep(.markdown-body pre code.hljs) {
+  display: block;
+  padding: 14px 16px 16px;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.66;
+  overflow-x: auto;
+}
+
+:deep(.markdown-body :not(pre) > code) {
+  background: #e9f0f8;
+  color: #16324d;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.92em;
 }
 
 :deep(.markdown-body img) {

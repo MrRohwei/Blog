@@ -27,7 +27,19 @@
       </div>
 
       <el-table :data="tableData" border>
-        <el-table-column prop="title" label="标题" min-width="210" show-overflow-tooltip />
+        <el-table-column label="标题" min-width="210">
+          <template #default="{ row }">
+            <el-link
+              :href="buildBlogDetailUrl(row.id)"
+              target="_blank"
+              type="primary"
+              class="title-link"
+              :underline="false"
+            >
+              {{ row.title || '-' }}
+            </el-link>
+          </template>
+        </el-table-column>
         <el-table-column prop="categoryName" label="分类" width="130" />
         <el-table-column label="标签" min-width="180">
           <template #default="{ row }">
@@ -99,6 +111,7 @@ import { useRouter } from 'vue-router'
 import { deleteBlog, getBlogPage, updateBlogStatus, updateBlogTop } from '@/api/blogs'
 import { getCategoryPage } from '@/api/categories'
 import { getTagPage } from '@/api/tags'
+import { resolveFrontendUrl } from '@/utils/site'
 
 const router = useRouter()
 
@@ -134,6 +147,10 @@ function statusTagType(status) {
       2: 'warning',
     }[status] || 'info'
   )
+}
+
+function buildBlogDetailUrl(id) {
+  return resolveFrontendUrl(`/blog/${id}`)
 }
 
 async function loadData() {
@@ -203,5 +220,13 @@ Promise.all([loadData(), loadOptions()]).catch((error) =>
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+.title-link {
+  width: 100%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

@@ -25,6 +25,7 @@ jobs:
         working-directory: ./voidpen-admin
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://admin.yourdomain.com' }}
+          VITE_FRONTEND_BASE_URL: ${{ secrets.FRONTEND_BASE_URL || 'https://yourdomain.com' }}
         run: |
           npm ci
           npm run build

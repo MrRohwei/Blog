@@ -26,6 +26,7 @@ cp .env.example .env
 - `MYSQL_PASSWORD`
 - `REDIS_PASSWORD`
 - `JWT_SECRET`
+- `FRONTEND_BASE_URL`（后台跳转前台地址）
 
 ## 3. 一键启动
 

@@ -8,6 +8,7 @@
 - `SERVER_USER`
 - `SERVER_SSH_KEY`
 - `VITE_API_BASE_URL`（可选）
+- `FRONTEND_BASE_URL`（可选，用于后台跳转前台）
 
 ## 2. CI/CD 工作流
 

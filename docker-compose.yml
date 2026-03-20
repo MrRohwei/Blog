@@ -106,6 +106,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_BASE_URL: http://localhost:8080
+        VITE_FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:5173}
     container_name: voidpen-admin
     restart: unless-stopped
     ports:
