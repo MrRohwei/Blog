@@ -152,6 +152,17 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
+    public BlogDetailVO getAdminBlogDetail(Long id) {
+        BlogDetailVO detail = blogMapper.selectBlogDetailById(id);
+        if (detail == null) {
+            throw new BusinessException(ErrorCode.BLOG_NOT_FOUND);
+        }
+        detail.setTags(buildTagList(blogTagMapper.selectTagRelationsByBlogId(id)));
+        detail.setViews(mergePendingViews(detail.getViews(), id));
+        return detail;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void createBlog(Long userId, BlogSaveRequest request) {
         validateCategoryAndTags(request.getCategoryId(), request.getTagIds());

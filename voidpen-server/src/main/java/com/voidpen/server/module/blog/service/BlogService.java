@@ -24,6 +24,8 @@ public interface BlogService {
 
     PageResult<BlogListVO> listAdminBlogs(BlogQueryRequest request);
 
+    BlogDetailVO getAdminBlogDetail(Long id);
+
     void createBlog(Long userId, BlogSaveRequest request);
 
     void updateBlog(Long id, BlogSaveRequest request);

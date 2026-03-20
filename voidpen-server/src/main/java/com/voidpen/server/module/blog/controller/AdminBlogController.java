@@ -8,6 +8,7 @@ import com.voidpen.server.module.blog.model.request.BlogQueryRequest;
 import com.voidpen.server.module.blog.model.request.BlogSaveRequest;
 import com.voidpen.server.module.blog.model.request.UpdateBlogStatusRequest;
 import com.voidpen.server.module.blog.model.request.UpdateBlogTopRequest;
+import com.voidpen.server.module.blog.model.response.BlogDetailVO;
 import com.voidpen.server.module.blog.model.response.BlogListVO;
 import com.voidpen.server.module.blog.service.BlogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,12 @@ public class AdminBlogController {
     @GetMapping
     public Result<PageResult<BlogListVO>> listBlogs(@Valid BlogQueryRequest request) {
         return Result.success(blogService.listAdminBlogs(request));
+    }
+
+    @Operation(summary = "后台博客详情")
+    @GetMapping("/{id}")
+    public Result<BlogDetailVO> getBlogDetail(@PathVariable Long id) {
+        return Result.success(blogService.getAdminBlogDetail(id));
     }
 
     @Operation(summary = "新建博客")
