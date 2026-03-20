@@ -4,6 +4,8 @@ CREATE DATABASE IF NOT EXISTS voidpen_dev
 
 USE voidpen_dev;
 
+SET NAMES utf8mb4;
+
 -- 用户表
 CREATE TABLE IF NOT EXISTS t_user (
     id              BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -111,4 +113,3 @@ CREATE TABLE IF NOT EXISTS t_advertisement (
 INSERT INTO t_user (username, password, nickname, role, status)
 SELECT 'admin', '$2a$10$.KvG7EENAfCtYJ/HLoAyce6YomL1x0PbBl66WScKjHb8/H8ORPbF6', '管理员', 'ROLE_ADMIN', 1
 WHERE NOT EXISTS (SELECT 1 FROM t_user WHERE username = 'admin');
-

@@ -3,12 +3,13 @@ package com.voidpen.server.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan("com.voidpen.server.module")
+@MapperScan(basePackages = "com.voidpen.server.module", annotationClass = Mapper.class)
 public class MybatisPlusConfig {
 
     @Bean
