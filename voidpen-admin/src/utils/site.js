@@ -1,4 +1,4 @@
-const DEFAULT_FRONTEND_BASE_URL = 'http://localhost:5173'
+const DEFAULT_FRONTEND_BASE_URL = ''
 
 function trimTrailingSlash(url) {
   return String(url || '').replace(/\/+$/, '')
@@ -8,6 +8,9 @@ export function getFrontendBaseUrl() {
   const envUrl = trimTrailingSlash(import.meta.env.VITE_FRONTEND_BASE_URL)
   if (envUrl) {
     return envUrl
+  }
+  if (typeof window !== 'undefined') {
+    return trimTrailingSlash(window.location.origin)
   }
   return DEFAULT_FRONTEND_BASE_URL
 }

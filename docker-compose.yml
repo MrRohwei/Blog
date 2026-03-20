@@ -89,8 +89,6 @@ services:
     build:
       context: ./voidpen-frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: http://localhost:8080
     container_name: voidpen-frontend
     restart: unless-stopped
     ports:
@@ -105,8 +103,7 @@ services:
       context: ./voidpen-admin
       dockerfile: Dockerfile
       args:
-        VITE_API_BASE_URL: http://localhost:8080
-        VITE_FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:5173}
+        VITE_FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-}
     container_name: voidpen-admin
     restart: unless-stopped
     ports:

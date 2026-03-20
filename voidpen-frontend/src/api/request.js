@@ -1,8 +1,33 @@
 import axios from 'axios'
 import { pushToast } from '@/utils/toast'
 
+function resolveApiBaseUrl() {
+  const raw = String(import.meta.env.VITE_API_BASE_URL || '').trim()
+  const normalized = raw.replace(/\/+$/, '')
+
+  if (!normalized) {
+    return ''
+  }
+
+  // Prevent production from accidentally calling localhost when env is not overridden correctly.
+  if (typeof window !== 'undefined') {
+    try {
+      const target = new URL(normalized, window.location.origin)
+      const isTargetLocal = ['localhost', '127.0.0.1'].includes(target.hostname)
+      const isCurrentLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+      if (isTargetLocal && !isCurrentLocal) {
+        return ''
+      }
+    } catch (_error) {
+      // Keep normalized value when URL parsing fails.
+    }
+  }
+
+  return normalized
+}
+
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  baseURL: resolveApiBaseUrl(),
   timeout: 10000,
 })
 
