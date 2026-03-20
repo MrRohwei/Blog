@@ -25,3 +25,6 @@ voidpen:
     expire: ${VOIDPEN_JWT_EXPIRE:7200}
   cors:
     allowed-origins: ${VOIDPEN_CORS_ALLOWED_ORIGINS:https://yourdomain.com,https://admin.yourdomain.com}
+  oss:
+    base-url: ${VOIDPEN_OSS_BASE_URL:https://yourdomain.com/uploads}
+    local-dir: ${VOIDPEN_OSS_LOCAL_DIR:/opt/voidpen/uploads}
