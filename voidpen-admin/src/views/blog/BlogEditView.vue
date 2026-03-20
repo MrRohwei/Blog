@@ -149,8 +149,8 @@ const featuredSwitch = computed({
 
 async function loadOptions() {
   const [categoryData, tagData] = await Promise.all([
-    getCategoryPage({ page: 1, size: 200 }),
-    getTagPage({ page: 1, size: 200 }),
+    getCategoryPage({ page: 1, size: 100 }),
+    getTagPage({ page: 1, size: 100 }),
   ])
   categories.value = categoryData.records || []
   tags.value = tagData.records || []
