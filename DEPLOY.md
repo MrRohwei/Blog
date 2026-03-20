@@ -77,7 +77,7 @@ docker compose down
 docker compose down -v
 ```
 
-## 6. 生产上线（CI/CD + Nginx）
+## 6. 生产上线（Nginx + HTTPS）
 
 见：`deploy/README.md`
 

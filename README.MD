@@ -65,7 +65,6 @@ Voidpen 是一个前后端分离的博客系统，包含：
 
 - Docker / Docker Compose
 - Nginx（前台、后台静态资源服务与反向代理）
-- GitHub Actions（基础 CI/CD 模板）
 
 ## 5. 项目结构说明（包结构）
 
@@ -96,7 +95,7 @@ Voidpen 是一个前后端分离的博客系统，包含：
 ├── docker-compose.yml               # 一键启动编排
 ├── DEPLOY.md                        # 最简部署说明
 ├── DOCKER-README.md                 # Docker 使用说明
-└── deploy/                          # 上线与 Nginx/CI 配置示例
+└── deploy/                          # 上线与 Nginx 配置示例
 ```
 
 后端模块内部基本遵循：
